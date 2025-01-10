@@ -2,6 +2,7 @@ import { Component, ElementRef, EventEmitter, Output } from '@angular/core';
 import { createChart } from '../../Models/MapDrawings';
 import { IStats } from '../../Models/models';
 import { ViewsService } from '../../services/views.service';
+import { createChartNoDraw } from '../../Models/MapNotDrawn';
 
 interface DownloadData {
   [year: string]: IStats;
@@ -62,7 +63,7 @@ export class ViewsComponent {
       next: data => {
         this.dataMonthly = data;
         const container = this.el.nativeElement.querySelector('#monthlyChart');
-        createChart(container, this.dataMonthly, this.dataPointClicked);
+        createChartNoDraw(container, this.dataMonthly);
       },
       error: err => console.error('Error fetching monthly data', err)
     });
@@ -104,7 +105,7 @@ export class ViewsComponent {
       next: data => {
         this.dataMonthly = data;
         const container = this.el.nativeElement.querySelector('#monthlyChart');
-        createChart(container, this.dataMonthly, this.dataPointClicked);
+         createChartNoDraw(container, this.dataMonthly);
       },
       error: err => console.error('Error fetching monthly data', err)
     });

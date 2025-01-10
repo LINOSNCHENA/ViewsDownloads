@@ -1,11 +1,9 @@
 import * as d3 from 'd3';
 
-import { EventEmitter } from '@angular/core';
 
-export function createChart(
+export function createChartNoDraw(
   container: HTMLElement,
   data: [string, number][],
-  dataPointClicked: EventEmitter<[string, number]>,
   width: number = window.innerWidth * 0.9,
   height: number = 400
 ): void {
@@ -22,7 +20,7 @@ export function createChart(
   const x = createXAxis(svg, data, innerWidth);
   const y = createYAxis(svg, data, innerHeight);
   drawLine(svg, data, x, y);
-  drawDots(svg, data, x, y, dataPointClicked);
+
 }
 
 export function drawDots(
@@ -30,8 +28,9 @@ export function drawDots(
   data: [string, number][],
   x: d3.ScaleBand<string>,
   y: d3.ScaleLinear<number, number>,
-  dataPointClicked: EventEmitter<[string, number]>
+
 ): void {
+
   svg.selectAll('circle')
     .data(data)
     .enter()
@@ -40,18 +39,44 @@ export function drawDots(
     .attr('cy', (d: any[]) => y(d[1]))
     .attr('r', 5)
     .attr('fill', '#d04a35')
-    .on('click', (event: any, d: [string, number] | undefined) => {
-      console.log('Clicked data point:', d);
-      // Emit the clicked data point
-      dataPointClicked.emit(d);
-      const selectedDataElement = document.getElementById('selectedData') as HTMLInputElement;
-      if (selectedDataElement) {
-        selectedDataElement.value = JSON.stringify(d);
-      } else {
-        console.error('Element with ID "selectedData" not found.');
-      }
-    });
 }
+
+
+
+export function drawLinexx(
+  svg: d3.Selection<SVGGElement, unknown, null, undefined>,
+  data: [string, number][],
+  x: d3.ScaleBand<string>,
+  y: d3.ScaleLinear<number, number>
+): void {
+  // Define the area generator
+  const area = d3.area<[string, number]>()
+    .x((d: any[]) => x(d[0])! + x.bandwidth() / 2)
+    .y0(y(0))  // Base of the area (y=0)
+    .y1((d: any[]) => y(d[1]))  // Top of the area (line)
+
+  // Append the area to the SVG
+  svg.append('path')
+    .datum(data)
+    .attr('fill', 'blue')  // Color of the area set to blue
+    .attr('opacity', 0.2)  // Adjust opacity for visibility
+    .attr('d', area);
+
+  // Define the line generator
+  const line = d3.line<[string, number]>()
+    .x((d: any[]) => x(d[0])! + x.bandwidth() / 2)
+    .y((d: any[]) => y(d[1]))
+
+  // Append the line to the SVG
+  svg.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', 'blue')  // Color of the line set to blue
+    .attr('stroke-width', 1.5)
+    .attr('d', line);
+}
+
+
 
 export function drawLine(
   svg: d3.Selection<SVGGElement, unknown, null, undefined>,
@@ -62,31 +87,30 @@ export function drawLine(
   // Define the area generator
   const area = d3.area<[string, number]>()
     .x((d: any[]) => x(d[0])! + x.bandwidth() / 2)
-    .y0(y(0))
-    .y1((d: any[]) => y(d[1]))
-  //  .curve(d3.curveMonotoneX);
+    .y0(y(0))  // Base of the area (y=0)
+    .y1((d: any[]) => y(d[1]))  // Top of the area (line)
 
   // Append the area to the SVG
   svg.append('path')
     .datum(data)
-    .attr('fill', 'blue')
-    .attr('opacity', 0.2)  // Optional: Adjust the opacity
+    .attr('fill', 'red')  // Color of the area
+    .attr('opacity', 0.2)  // Adjust opacity for visibility
     .attr('d', area);
 
   // Define the line generator
   const line = d3.line<[string, number]>()
     .x((d: any[]) => x(d[0])! + x.bandwidth() / 2)
     .y((d: any[]) => y(d[1]))
-  //  .curve(d3.curveMonotoneX);
 
   // Append the line to the SVG
   svg.append('path')
     .datum(data)
     .attr('fill', 'none')
-    .attr('stroke', '#d04a35')
+    .attr('stroke', '#d04a35')  // Color of the line
     .attr('stroke-width', 1.5)
     .attr('d', line);
 }
+
 
 export function createXAxis(
   svg: d3.Selection<SVGGElement, unknown, null, undefined>,
@@ -98,6 +122,7 @@ export function createXAxis(
     .domain(data.map(d => d[0]))
     .paddingInner(0.1)
     .paddingOuter(0.1);
+
   svg.append('g')
     .attr('transform', `translate(0, ${300})`)
     .call(d3.axisBottom(x));
@@ -113,6 +138,7 @@ export function createXAxis(
     .attr('stroke', '#ddd')
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '2,2');
+
   return x;
 }
 
@@ -123,10 +149,12 @@ export function createYAxis(
 ): d3.ScaleLinear<number, number> {
   // Extract the numeric values from the data
   const numericData = data.map(d => d[1]);
+
   // Create a linear scale for the Y-axis
   const y = d3.scaleLinear()
     .domain([0, d3.max(numericData)!])
     .range([height, 0]);
+
   // Append the Y-axis to the SVG
   svg.append('g')
     .call(d3.axisLeft(y).ticks(d3.max(numericData, d => Math.ceil(d / 250))!));
@@ -144,5 +172,6 @@ export function createYAxis(
     .attr('stroke', '#ddd')
     .attr('stroke-width', 2)
     .attr('stroke-dasharray', '2,2');
+
   return y;
 }
