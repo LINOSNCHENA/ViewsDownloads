@@ -1,0 +1,55 @@
+<div class="tabs flex justify-center space-x-4 my-4 w-100vw">
+  <button
+    class="tab-button"
+    (click)="selectTab('tab1')"
+    [class.active]="selectedTab === 'tab1'"
+  >
+    1. Download
+  </button>
+
+  <button
+    class="tab-button"
+    (click)="selectTab('tab2')"
+    [class.active]="selectedTab === 'tab2'"
+  >
+    2. Download
+  </button>
+
+  <button
+    class="tab-button"
+    (click)="selectTab('tab3')"
+    [class.active]="selectedTab === 'tab3'"
+  >
+    3. Views
+  </button>
+
+  <button
+    class="tab-button"
+    (click)="selectTab('tab4')"
+    [class.active]="selectedTab === 'tab4'"
+  >
+    4. Views
+  </button>
+</div>
+
+<div class="tab-content mt-6">
+  <ng-container *ngIf="selectedTab === 'tab1'">
+    fffffffffff
+    <app-views></app-views>
+  </ng-container>
+
+  <ng-container *ngIf="selectedTab === 'tab2'">
+    ddddd
+    <app-downloads></app-downloads>
+  </ng-container>
+
+  <ng-container *ngIf="selectedTab === 'tab3'">
+    ddfdsfe
+    <app-views></app-views>
+  </ng-container>
+
+  <ng-container *ngIf="selectedTab === 'tab4'">
+    sdsde
+    <app-downloads></app-downloads>
+  </ng-container>
+</div>
